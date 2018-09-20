@@ -27,8 +27,7 @@ class DetectObjects(Resource):
         user_query = args['query']
 
         #Detect objects in image
-        detections = detector.detectObjectsFromImage(input_image=os.path.join(execution_path , "images/image.jpg"),
-                                    output_image_path=os.path.join(execution_path , "images/image-out.jpg"))
+        detections = detector.detectObjectsFromImage(input_image=os.path.join(execution_path , "images/image.jpg"), output_image_path=os.path.join(execution_path , "images/image-out.jpg"))
 
         # create JSON object
         output = json.dumps(detections)

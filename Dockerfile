@@ -37,5 +37,6 @@ ADD cv_app ${APP_HOME}
 RUN wget --quiet https://github.com/OlafenwaMoses/ImageAI/releases/download/1.0/resnet50_coco_best_v2.0.1.h5 -O ${APP_HOME}/models/resnet50_coco_best_v2.0.1.h5
 
 WORKDIR ${APP_HOME}
+EXPOSE 5000
 
 CMD [ "/bin/bash" ]
