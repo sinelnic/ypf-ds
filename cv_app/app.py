@@ -31,23 +31,28 @@ class Filer(Resource):
         return jsonify(files)
 
 class DetectObjects(Resource):
+    def __init__(self):
+        self.detector = ObjectDetection()
+        self.detector.setModelTypeAsRetinaNet()
+        self.detector.setModelPath( os.path.join(execution_path , "models/resnet50_coco_best_v2.0.1.h5"))
+        self.detector.loadModel()
+
     def get(self):
         # use parser and find the user's query
         args = parser.parse_args()
         user_query = args['query']
 
         #Detect objects in image
-        detector = ObjectDetection()
-        detector.setModelTypeAsRetinaNet()
-        detector.setModelPath( os.path.join(execution_path , "models/resnet50_coco_best_v2.0.1.h5"))
-        detector.loadModel()
-
-        detections = detector.detectObjectsFromImage(input_image=os.path.join(execution_path , "images/image.jpg"), 
+        detections = self.detector.detectObjectsFromImage(input_image=os.path.join(execution_path , "images/image.jpg"), 
                                                output_image_path=os.path.join(execution_path , "images/image-out.jpg"))
 
         # create JSON object
-        return jsonify(detections)
-
+        output = []
+        for eachObject in detections:
+            incl_keys = ['name','percentage_probability']
+            element = { k: eachObject[k] for k in set(incl_keys) & set(eachObject.keys()) }
+            output.append( element )
+        return jsonify(output)
 
 # Setup the Api resource routing here
 # Route the URL to the resource
