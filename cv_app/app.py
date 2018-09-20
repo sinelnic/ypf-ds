@@ -7,6 +7,11 @@ from flask_restful import reqparse, abort, Api, Resource
 from imageai.Detection import ObjectDetection
 
 execution_path = os.getcwd()
+upload_dir = os.path.join(execution_path, "images")
+models_dir = os.path.join(execution_path, "models")
+
+if not os.path.exists(upload_dir):
+    os.makedirs(upload_dir)
 
 app = Flask(__name__)
 api = Api(app)
@@ -23,9 +28,8 @@ class Filer(Resource):
     def get(self):
         """Endpoint to list files on the server."""
         files = []
-        dir = os.path.join(execution_path, "images")
-        for filename in os.listdir(dir):
-            path = os.path.join(dir , filename)
+        for filename in os.listdir(upload_dir):
+            path = os.path.join(upload_dir , filename)
             if os.path.isfile(path):
                 files.append(filename)
         return jsonify(files)
@@ -34,17 +38,17 @@ class DetectObjects(Resource):
     def __init__(self):
         self.detector = ObjectDetection()
         self.detector.setModelTypeAsRetinaNet()
-        self.detector.setModelPath( os.path.join(execution_path , "models/resnet50_coco_best_v2.0.1.h5"))
+        self.detector.setModelPath( os.path.join(models_dir , "resnet50_coco_best_v2.0.1.h5"))
         self.detector.loadModel()
 
-    def get(self):
+    def get(self, image_name):
         # use parser and find the user's query
         args = parser.parse_args()
         user_query = args['query']
 
         #Detect objects in image
-        detections = self.detector.detectObjectsFromImage(input_image=os.path.join(execution_path , "images/image.jpg"), 
-                                               output_image_path=os.path.join(execution_path , "images/image-out.jpg"))
+        detections = self.detector.detectObjectsFromImage(input_image=os.path.join(upload_dir , image_name), 
+                                               output_image_path=os.path.join(upload_dir , 'image-out.jpg'))
 
         # create JSON object
         output = []
@@ -58,7 +62,7 @@ class DetectObjects(Resource):
 # Route the URL to the resource
 
 api.add_resource(Filer, '/')
-api.add_resource(DetectObjects, '/detect')
+api.add_resource(DetectObjects, '/detect/<string:image_name>')
 
 
 if __name__ == '__main__':
