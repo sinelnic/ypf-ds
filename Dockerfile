@@ -5,7 +5,9 @@ ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 ENV PATH /opt/conda/bin:$PATH
 ENV APP_NAME cv_app
 ENV APP_HOME /opt/${APP_NAME}
-ENV ENVIRONMENT dev 
+ENV ENVIRONMENT dev
+ENV FLASK_APP ${APP_HOME}/app.py 
+ENV FLASK_ENV ${ENVIRONMENT}
 
 RUN apt-get update --fix-missing && apt-get install -y wget bzip2 ca-certificates \
  libglib2.0-0 libxext6 libsm6 libxrender1 \
@@ -39,4 +41,4 @@ RUN wget --quiet https://github.com/OlafenwaMoses/ImageAI/releases/download/1.0/
 WORKDIR ${APP_HOME}
 EXPOSE 5000
 
-CMD [ "/bin/bash" ]
+CMD [ "/opt/conda/bin/flask", "run" ,"--host=0.0.0.0" ]
